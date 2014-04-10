@@ -1083,7 +1083,9 @@ abstract class Presenter extends Control implements Application\IPresenter
 	 */
 	public function restoreRequest($key)
 	{
-		$this->requestStash->restoreRequest($key);
+		if ($response = $this->requestStash->restoreRequest($key)) {
+			$this->sendResponse($response);
+		}
 	}
 
 

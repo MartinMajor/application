@@ -71,14 +71,13 @@ class RequestStash extends Nette\Object implements IRequestStash
 	/**
 	 * Restores request from session.
 	 * @param  string key
-	 * @throws \Nette\Application\AbortException
-	 * @return void
+	 * @return Responses\RedirectResponse|NULL
 	 */
 	public function restoreRequest($key)
 	{
 		list($request, $url) = $this->loadRequestFromSession($key);
 		if ($request === NULL) {
-			return;
+			return NULL;
 		}
 
 		if ($this->flashStorage->isOpened()) {

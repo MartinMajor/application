@@ -24,16 +24,15 @@ interface IRequestStash
 	 * @param  string expiration time
 	 * @return string key
 	 */
-	public function storeRequest(Request $request, $expiration = '+ 10 minutes');
+	function storeRequest(Request $request, $expiration = '+ 10 minutes');
 
 
 	/**
 	 * Restores request by its key.
 	 * @param  string key
-	 * @throws AbortException
-	 * @return void
+	 * @return Responses\RedirectResponse|NULL
 	 */
-	public function restoreRequest($key);
+	function restoreRequest($key);
 
 
 	/**
@@ -41,6 +40,6 @@ interface IRequestStash
 	 * @param  \Nette\Http\IRequest
 	 * @return Request|NULL
 	 */
-	public function getRequest(Nette\Http\IRequest $httpRequest);
+	function getRequest(Nette\Http\IRequest $httpRequest);
 
 }
