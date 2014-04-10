@@ -85,7 +85,7 @@ class RequestStash extends Nette\Object implements IRequestStash
 			$url .= '&' . IMessagesStorage::FLASH_KEY . '=' . $this->flashStorage->getId();
 		}
 
-		// $presenter->redirectUrl($url); // todo
+		return new Responses\RedirectResponse($url);
 	}
 
 
