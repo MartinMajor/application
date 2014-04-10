@@ -7,8 +7,7 @@
 
 namespace Nette\Application;
 
-use Nette,
-	Nette\Application\UI\Presenter;
+use Nette;
 
 
 /**
@@ -21,7 +20,7 @@ class RequestStash extends Nette\Object implements IRequestStash
 	/** URL parameter key */
 	const REQUEST_KEY = '_rid';
 
-	/** @var Nette\Http\Request */
+	/** @var Nette\Http\IRequest */
 	private $httpRequest;
 
 	/** @var Nette\Http\Session */
@@ -30,12 +29,17 @@ class RequestStash extends Nette\Object implements IRequestStash
 	/** @var Nette\Security\User */
 	private $user;
 
+	/** @var Nette\Application\IMessagesStorage */
+	private $flashStorage;
 
-	public function __construct(Nette\Http\Request $httpRequest, Nette\Http\Session $session, Nette\Security\User $user)
+
+
+	public function __construct(Nette\Http\IRequest $httpRequest, Nette\Http\Session $session, Nette\Security\User $user, IMessagesStorage $flashStorage)
 	{
 		$this->httpRequest = $httpRequest;
 		$this->session = $session;
 		$this->user = $user;
+		$this->flashStorage = $flashStorage;
 	}
 
 
@@ -67,30 +71,30 @@ class RequestStash extends Nette\Object implements IRequestStash
 	/**
 	 * Restores request from session.
 	 * @param  string key
-	 * @param  \Nette\Application\UI\Presenter
 	 * @throws \Nette\Application\AbortException
 	 * @return void
 	 */
-	public function restoreRequest($key, Presenter $presenter)
+	public function restoreRequest($key)
 	{
 		list($request, $url) = $this->loadRequestFromSession($key);
 		if ($request === NULL) {
 			return;
 		}
 
-		if ($presenter->hasFlashSession()) {
-			$url .= '&' . Presenter::FLASH_KEY . '=' . $presenter->getParameter(Presenter::FLASH_KEY);
+		if ($this->flashStorage->isOpened()) {
+			$url .= '&' . IMessagesStorage::FLASH_KEY . '=' . $this->flashStorage->getId();
 		}
-		$presenter->redirectUrl($url);
+
+		// $presenter->redirectUrl($url); // todo
 	}
 
 
 	/**
 	 * Returns stored request.
-	 * @param  \Nette\Http\Request
+	 * @param  \Nette\Http\IRequest
 	 * @return Request|NULL
 	 */
-	public function getRequest(Nette\Http\Request $httpRequest)
+	public function getRequest(Nette\Http\IRequest $httpRequest)
 	{
 		$key = $httpRequest->getQuery(static::REQUEST_KEY);
 
@@ -99,10 +103,10 @@ class RequestStash extends Nette\Object implements IRequestStash
 			return NULL;
 		}
 
-		$flash = $this->httpRequest->getUrl()->getQueryParameter(Presenter::FLASH_KEY);
+		$flash = $this->httpRequest->getUrl()->getQueryParameter(IMessagesStorage::FLASH_KEY);
 		if ($flash !== NULL) {
 			$parameters = $request->getParameters();
-			$request->setParameters($parameters + array(Presenter::FLASH_KEY => $flash));
+			$request->setParameters($parameters + array(IMessagesStorage::FLASH_KEY => $flash));
 		}
 
 		return $request;

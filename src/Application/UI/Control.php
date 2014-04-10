@@ -73,9 +73,10 @@ abstract class Control extends PresenterComponent implements IRenderable
 			$template->basePath = preg_replace('#https?://[^/]+#A', '', $template->baseUrl);
 
 			// flash message
-			if ($presenter->hasFlashSession()) {
+			$flashStorage = $presenter->getFlashStorage();
+			if ($flashStorage->isOpened()) {
 				$id = $this->getParameterId('flash');
-				$template->flashes = $presenter->getFlashSession()->$id;
+				$template->flashes = $flashStorage->getMessages($id);
 			}
 		}
 		if (!isset($template->flashes) || !is_array($template->flashes)) {
@@ -105,14 +106,10 @@ abstract class Control extends PresenterComponent implements IRenderable
 	 */
 	public function flashMessage($message, $type = 'info')
 	{
+		$storage = $this->getPresenter()->getFlashStorage();
 		$id = $this->getParameterId('flash');
-		$messages = $this->getPresenter()->getFlashSession()->$id;
-		$messages[] = $flash = (object) array(
-			'message' => $message,
-			'type' => $type,
-		);
-		$this->getTemplate()->flashes = $messages;
-		$this->getPresenter()->getFlashSession()->$id = $messages;
+		$flash = $storage->addMessage($message, $type, $id);
+		$this->getTemplate()->flashes = $storage->getMessages($id);
 		return $flash;
 	}
 

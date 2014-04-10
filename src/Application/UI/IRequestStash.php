@@ -30,18 +30,17 @@ interface IRequestStash
 	/**
 	 * Restores request by its key.
 	 * @param  string key
-	 * @param  UI\Presenter
 	 * @throws AbortException
 	 * @return void
 	 */
-	public function restoreRequest($key, UI\Presenter $presenter);
+	public function restoreRequest($key);
 
 
 	/**
 	 * Returns stored request.
-	 * @param  \Nette\Http\Request
+	 * @param  \Nette\Http\IRequest
 	 * @return Request|NULL
 	 */
-	public function getRequest(Nette\Http\Request $httpRequest);
+	public function getRequest(Nette\Http\IRequest $httpRequest);
 
 }
